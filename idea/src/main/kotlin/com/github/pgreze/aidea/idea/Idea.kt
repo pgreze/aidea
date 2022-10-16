@@ -11,8 +11,8 @@ data class IdeaInstall(
 )
 
 enum class IdeaType(val launcherName: String) {
-    ANDROID_STUDIO("studio"),
     IDEA("idea"),
+    ANDROID_STUDIO("studio"),
 }
 
 fun listIdeaInstallations(): Sequence<IdeaInstall> = sequence {
@@ -25,12 +25,12 @@ fun listIdeaInstallations(): Sequence<IdeaInstall> = sequence {
         "Library/Application Support/JetBrains/Toolbox/apps"
     )
     yieldAll(
-        toolboxRootDir.resolve("AndroidStudio")
-            .resolveToolboxLaunchers(IdeaType.ANDROID_STUDIO)
-    )
-    yieldAll(
         toolboxRootDir.resolve("IDEA-C")
             .resolveToolboxLaunchers(IdeaType.IDEA)
+    )
+    yieldAll(
+        toolboxRootDir.resolve("AndroidStudio")
+            .resolveToolboxLaunchers(IdeaType.ANDROID_STUDIO)
     )
 
     // Iterate the system + user Applications folders
@@ -40,12 +40,12 @@ fun listIdeaInstallations(): Sequence<IdeaInstall> = sequence {
     ).flatMap { it.listFiles()?.toList() ?: listOf() }.forEach { application ->
         when {
             application.extension != "app" -> null
-            // brew install android-studio{,-preview-beta,-preview-canary}
-            application.startsWith("Android Studio") ->
-                application.resolveLauncher(IdeaType.ANDROID_STUDIO)
             // brew install intellij-idea{,-ce}
             application.startsWith("IntelliJ IDEA") ->
                 application.resolveLauncher(IdeaType.IDEA)
+            // brew install android-studio{,-preview-beta,-preview-canary}
+            application.startsWith("Android Studio") ->
+                application.resolveLauncher(IdeaType.ANDROID_STUDIO)
             else -> null
         }?.let { yield(it) }
     }
