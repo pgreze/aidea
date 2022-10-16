@@ -3,6 +3,7 @@ package com.github.pgreze.aidea.app
 import com.github.pgreze.aidea.idea.IdeaInstall
 
 fun List<IdeaInstall>.chooseInstall(): IdeaInstall? {
+    if (size == 1) return first()
     displayChoiceHeaders()
     return selectInstallIndex(size)
         ?.let(::get)
