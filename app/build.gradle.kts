@@ -11,4 +11,5 @@ dependencies {
     implementation(project(":idea"))
 
     api(KotlinX.coroutines.core)
+    implementation("com.github.ajalt.clikt:clikt:_")
 }
