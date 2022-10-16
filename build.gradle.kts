@@ -8,7 +8,7 @@ version = project.findProperty("aidea_version")?.toString() ?: "WIP"
 subprojects {
     plugins.withType(org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper::class) {
         tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-            kotlinOptions.jvmTarget = "1.8"
+            kotlinOptions.jvmTarget = "1.11"
         }
 
         tasks.withType<Test> {
