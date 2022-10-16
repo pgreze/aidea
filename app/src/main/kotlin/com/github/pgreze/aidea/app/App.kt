@@ -4,6 +4,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
+import com.github.pgreze.aidea.idea.listIdeaInstallations
 import java.io.File
 
 fun main(args: Array<String>) {
@@ -12,14 +13,20 @@ fun main(args: Array<String>) {
 
 class App : CliktCommand() {
 
-    private val target: File? by argument(help = "File or folder to open an IDEA based IDE with.")
+    private val target: File? by option(help = "File or folder to open an IDEA based IDE with.")
         .file(mustExist = true)
+
+    private val ideaInstalls by lazy {
+        listIdeaInstallations().sortedByDescending { it.installDir }
+    }
 
     override fun run() {
         val target = target ?: run {
-            TODO("List IDEA installations")
+            // Display the installation paths.
+            ideaInstalls.forEach { println(it.installDir) }
             return
         }
+
         when {
             target.isDirectory -> {
                 TODO("Open an IDEA instance with this project")
