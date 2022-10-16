@@ -1,0 +1,14 @@
+plugins {
+    application
+    kotlin("jvm")
+}
+
+application {
+    mainClass.set("com.github.pgreze.aidea.app.AppKt")
+}
+
+dependencies {
+    implementation(project(":idea"))
+
+    api(KotlinX.coroutines.core)
+}
