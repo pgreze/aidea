@@ -18,6 +18,7 @@ tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
 configure<com.palantir.gradle.graal.GraalExtension> {
     mainClass(application.mainClass.get())
     outputName(rootProject.name)
+    javaVersion("11")
     option("--report-unsupported-elements-at-runtime")
     option("--initialize-at-build-time")
     option("--no-fallback")
