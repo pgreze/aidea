@@ -98,5 +98,5 @@ internal fun File.resolveLauncher(
  */
 internal fun String.extractInfoString(): String = trim().let {
     // Alternative: we could use the ". " separator
-    it.substring("<string>".length, it.length - it.indexOf("Copyright") - 2)
+    it.substring("<string>".length, it.indexOf("Copyright") - 2)
 }

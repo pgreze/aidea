@@ -11,6 +11,6 @@ class IdeaTest {
         val string = "  <string>$infoString. $copyright</string>"
 
         assertThat(string.extractInfoString())
-            .isEqualTo("IntelliJ IDEA 2022.2.3, build IC-222.4345.14")
+            .isEqualTo(infoString)
     }
 }
