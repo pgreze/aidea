@@ -15,9 +15,18 @@ fun main(args: Array<String>) {
     App().main(args)
 }
 
-class App : CliktCommand() {
+class App : CliktCommand(help = """
+    idea alternative supporting a multi-installation setup
+    (like Jetbrains Toolbox but in your shell).
 
-    private val target: File? by argument(help = "File or folder to open an IDEA based IDE with.")
+    Without any argument, displays all the found installations.
+
+    Provides a folder to open it with the selected IDE.
+
+    Provides a .main.kts file to open it in a temporary IDEA session.
+""".trimIndent()) {
+
+    private val target: File? by argument(help = "File or folder to interact with.")
         .file(mustExist = true)
         .optional()
 
@@ -34,10 +43,12 @@ class App : CliktCommand() {
 
         when {
             target.isDirectory -> {
-                openProject(target).let(::exitProcess)
+                openProject(target)
+                    .let(::exitProcess)
             }
-            target.isFile && target.endsWith(".main.kts") -> {
-                TODO("Generate and open a KTS friendly project")
+            target.isFile && target.name.endsWith(".main.kts") -> {
+                target.openMainKtsFile()
+                    ?.let(::failWithMessage)
             }
             else -> {
                 failWithMessage("Unsupported file: $target")
