@@ -1,35 +1,34 @@
 package com.github.pgreze.aidea.app
 
-import com.github.pgreze.process.process
-import kotlinx.coroutines.runBlocking
 import java.io.File
+import java.io.IOException
 import kotlin.io.path.createSymbolicLinkPointingTo
-import kotlin.math.abs
-import kotlin.system.exitProcess
+import kotlin.math.absoluteValue
 
-fun File.openMainKtsFile(): String? = runBlocking {
-    val identifier = absolutePath.hashCode().let(::abs).toString()
-    val projectDir = File(System.getProperty("user.home"))
-        .resolve(".kidea/$identifier-$name")
-
-    require(projectDir.deleteRecursively()) {
-        return@runBlocking "Could not delete $projectDir"
-    }
-    projectDir.mkdirs()
-    projectDir.resolve("build.gradle.kts")
-        .writeText(BUILD_GRADLE_KTS)
-    projectDir.resolve("settings.gradle")
-        .writeText("rootProject.name = \"$name\"")
-
-    projectDir.resolve("src").let { srcDir ->
-        srcDir.mkdir()
-        srcDir.resolve(name).toPath()
-            .createSymbolicLinkPointingTo(toPath().toAbsolutePath())
-    }
-
-    process("idea", projectDir.absolutePath)
-    null
+fun File.resolveMainKtsProject(): File {
+    val identifier = absolutePath.hashCode().absoluteValue.toString()
+    return File(System.getProperty("user.home"))
+        .resolve(".aidea/kts/$identifier-$name")
 }
+
+fun File.generateMainKtsProject(): File =
+    resolveMainKtsProject()
+        .apply {
+            require(deleteRecursively()) {
+                throw IOException("Could not delete $this")
+            }
+            mkdirs()
+            resolve("build.gradle.kts")
+                .writeText(BUILD_GRADLE_KTS)
+            resolve("settings.gradle")
+                .writeText("rootProject.name = \"${name}\"")
+
+            resolve("src").let { srcDir ->
+                srcDir.mkdir()
+                srcDir.resolve(this@generateMainKtsProject.name).toPath()
+                    .createSymbolicLinkPointingTo(this@generateMainKtsProject.toPath().toAbsolutePath())
+            }
+        }
 
 private val BUILD_GRADLE_KTS = """
     plugins {

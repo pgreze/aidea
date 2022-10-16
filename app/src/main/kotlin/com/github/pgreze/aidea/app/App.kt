@@ -5,6 +5,7 @@ import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.optional
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.pgreze.aidea.idea.IdeaInstall
+import com.github.pgreze.aidea.idea.IdeaType
 import com.github.pgreze.aidea.idea.listIdeaInstallations
 import com.github.pgreze.process.process
 import kotlinx.coroutines.runBlocking
@@ -15,7 +16,8 @@ fun main(args: Array<String>) {
     App().main(args)
 }
 
-class App : CliktCommand(help = """
+class App : CliktCommand(
+    help = """
     idea alternative supporting a multi-installation setup
     (like Jetbrains Toolbox but in your shell).
 
@@ -24,8 +26,8 @@ class App : CliktCommand(help = """
     Provides a folder to open it with the selected IDE.
 
     Provides a .main.kts file to open it in a temporary IDEA session.
-""".trimIndent()) {
-
+""".trimIndent()
+) {
     private val target: File? by argument(help = "File or folder to interact with.")
         .file(mustExist = true)
         .optional()
@@ -46,10 +48,12 @@ class App : CliktCommand(help = """
                 openProject(target)
                     .let(::exitProcess)
             }
+
             target.isFile && target.name.endsWith(".main.kts") -> {
-                target.openMainKtsFile()
-                    ?.let(::failWithMessage)
+                openMainKtsFile(target)
+                    .let(::exitProcess)
             }
+
             else -> {
                 failWithMessage("Unsupported file: $target")
             }
@@ -57,32 +61,43 @@ class App : CliktCommand(help = """
     }
 
     private fun openProject(target: File): Int = runBlocking {
-        val ideaInstalls = ideaInstalls.toList()
-            .ensureNotEmpty()
+        val ideaInstalls = ideaInstalls.toNonEmptyList()
 
-        ideaInstalls.displayChoiceHeaders()
+        val selectedInstall = ideaInstalls.chooseInstall()
+            ?: return@runBlocking 0
 
-        val selectedInstallIndex = selectInstallIndex(ideaInstalls.size)
-        if (selectedInstallIndex == -1) return@runBlocking 0
-        val selectedLauncher = ideaInstalls[selectedInstallIndex]
-            .launcher
-            .toString()
-
-        process(
-            "/usr/bin/open",
-            "-na",
-            selectedLauncher,
-            "--args",
-            target.absolutePath.toString(),
-        ).resultCode
+        selectedInstall.openProject(target)
     }
 
-    private fun List<IdeaInstall>.ensureNotEmpty(): List<IdeaInstall> =
-        this.takeUnless { it.isEmpty() }
-            ?: failWithMessage("No IDEA installation found")
+    private fun openMainKtsFile(target: File): Int = runBlocking {
+        val projectDir = target.generateMainKtsProject()
 
-    private fun failWithMessage(message: String): Nothing {
-        echo(message, err = true)
-        exitProcess(1)
+        val ideaInstalls = ideaInstalls
+            .filter { it.ideaType == IdeaType.IDEA }
+            .toNonEmptyList()
+
+        val selectedInstall = ideaInstalls.chooseInstall()
+            ?: return@runBlocking 0
+
+        selectedInstall.openProject(projectDir)
     }
 }
+
+fun Sequence<IdeaInstall>.toNonEmptyList(): List<IdeaInstall> =
+    toList()
+        .takeUnless { it.isEmpty() }
+        ?: failWithMessage("No IDEA installation found")
+
+fun failWithMessage(message: String): Nothing {
+    System.err.println(message)
+    exitProcess(1)
+}
+
+suspend fun IdeaInstall.openProject(target: File): Int =
+    process(
+        "/usr/bin/open",
+        "-na",
+        launcher.absolutePath.toString(),
+        "--args",
+        target.absolutePath.toString(),
+    ).resultCode
