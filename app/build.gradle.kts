@@ -12,4 +12,5 @@ dependencies {
 
     api(KotlinX.coroutines.core)
     implementation("com.github.ajalt.clikt:clikt:_")
+    implementation("com.github.pgreze:kotlin-process:_")
 }

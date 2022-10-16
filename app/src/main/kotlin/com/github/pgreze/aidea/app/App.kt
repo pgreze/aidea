@@ -4,8 +4,12 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.optional
 import com.github.ajalt.clikt.parameters.types.file
+import com.github.pgreze.aidea.idea.IdeaInstall
 import com.github.pgreze.aidea.idea.listIdeaInstallations
+import com.github.pgreze.process.process
+import kotlinx.coroutines.runBlocking
 import java.io.File
+import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
     App().main(args)
@@ -30,14 +34,44 @@ class App : CliktCommand() {
 
         when {
             target.isDirectory -> {
-                TODO("Open an IDEA instance with this project")
+                openProject(target).let(::exitProcess)
             }
             target.isFile && target.endsWith(".main.kts") -> {
                 TODO("Generate and open a KTS friendly project")
             }
             else -> {
-                error("Unsupported file: $target")
+                failWithMessage("Unsupported file: $target")
             }
         }
+    }
+
+    private fun openProject(target: File): Int = runBlocking {
+        val ideaInstalls = ideaInstalls.toList()
+            .ensureNotEmpty()
+
+        ideaInstalls.displayChoiceHeaders()
+
+        val selectedInstallIndex = selectInstallIndex(ideaInstalls.size)
+        if (selectedInstallIndex == -1) return@runBlocking 0
+        val selectedLauncher = ideaInstalls[selectedInstallIndex]
+            .launcher
+            .toString()
+
+        process(
+            "/usr/bin/open",
+            "-na",
+            selectedLauncher,
+            "--args",
+            target.absolutePath.toString(),
+        ).resultCode
+    }
+
+    private fun List<IdeaInstall>.ensureNotEmpty(): List<IdeaInstall> =
+        this.takeUnless { it.isEmpty() }
+            ?: failWithMessage("No IDEA installation found")
+
+    private fun failWithMessage(message: String): Nothing {
+        echo(message, err = true)
+        exitProcess(1)
     }
 }
