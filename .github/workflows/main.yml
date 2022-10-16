@@ -43,7 +43,7 @@ jobs:
         if: runner.os == 'Linux'
         with:
           name: aidea-jar
-          path: app/build/install/aidea.jar
+          path: app/build/install/app-shadow/lib/aidea-all.jar
       # Publish GraalVM
       - uses: actions/upload-artifact@v1
         if: runner.os == 'Linux'
