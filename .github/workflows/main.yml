@@ -38,20 +38,20 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle
       # Build
       - name: Build
-        run: ./gradlew build cli:installShadowDist cli:nativeImage --continue
+        run: ./gradlew build app:installShadowDist app:nativeImage --continue
       - uses: actions/upload-artifact@v1
         if: runner.os == 'Linux'
         with:
           name: aidea-jar
-          path: cli/build/install/aidea.jar
+          path: app/build/install/aidea.jar
       # Publish GraalVM
       - uses: actions/upload-artifact@v1
         if: runner.os == 'Linux'
         with:
           name: aidea-linux
-          path: cli/build/graal/aidea
+          path: app/build/graal/aidea
       - uses: actions/upload-artifact@v1
         if: runner.os == 'macOS'
         with:
           name: aidea-macos
-          path: cli/build/graal/aidea
+          path: app/build/graal/aidea
