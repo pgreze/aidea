@@ -1,0 +1,57 @@
+# https://help.github.com/en/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+# https://help.github.com/en/actions/language-and-framework-guides/publishing-java-packages-with-gradle
+
+name: Publish
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    # https://help.github.com/en/actions/reference/virtual-environments-for-github-hosted-runners
+    # https://help.github.com/en/actions/configuring-and-managing-workflows/configuring-a-workflow#configuring-a-build-matrix
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      # setup
+      - uses: actions/checkout@v2
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      # Cache
+      - name: Cache Gradle wrapper
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/*') }}
+          restore-keys: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/*') }}
+      - name: Cache Gradle packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
+          restore-keys: ${{ runner.os }}-gradle
+      # Build
+      - name: Build
+        run: ./gradlew build cli:installShadowDist cli:nativeImage --continue
+      - uses: actions/upload-artifact@v1
+        if: runner.os == 'Linux'
+        with:
+          name: aidea-jar
+          path: cli/build/install/aidea.jar
+      # Publish GraalVM
+      - uses: actions/upload-artifact@v1
+        if: runner.os == 'Linux'
+        with:
+          name: aidea-linux
+          path: cli/build/graal/aidea
+      - uses: actions/upload-artifact@v1
+        if: runner.os == 'macOS'
+        with:
+          name: aidea-macos
+          path: cli/build/graal/aidea
