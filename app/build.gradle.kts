@@ -1,10 +1,15 @@
 plugins {
     application
     kotlin("jvm")
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 application {
     mainClass.set("com.github.pgreze.aidea.app.AppKt")
+}
+
+tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
+    archiveBaseName.set("aidea")
 }
 
 dependencies {
