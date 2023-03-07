@@ -54,11 +54,6 @@ fun listIdeaInstallations(): Sequence<IdeaInstall> = sequence {
 private fun File.resolveToolboxLaunchers(
     ideaType: IdeaType
 ): Sequence<IdeaInstall> = sequence {
-    if (isDirectory.not()) {
-        throw IllegalArgumentException("Invalid toolbox directory $this")
-    }
-
-    // TODO: improve this part
     listFiles()?.forEach f1@{ f1 -> // ch-0
         if (f1.isDirectory.not()) return@f1
         f1.listFiles()?.forEach f2@{ f2 -> // 202.7660.26

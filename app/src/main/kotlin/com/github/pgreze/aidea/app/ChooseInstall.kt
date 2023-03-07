@@ -21,7 +21,7 @@ private fun List<IdeaInstall>.displayChoiceHeaders() {
 private fun selectInstallIndex(size: Int): Int? {
     while (true) {
         print("Which installation to use? ")
-        return (readLine() ?: return null) // ctrl+d
+        return (readlnOrNull() ?: return null) // ctrl+d
             .toIntOrNull()
             ?.takeIf { it - 1 in 0 until size }
             ?: continue

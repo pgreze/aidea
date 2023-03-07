@@ -20,7 +20,7 @@ fun main(args: Array<String>) {
 
 class App : CliktCommand(
     help = """
-    idea alternative supporting a multi-installation setup
+    IntelliJ provided idea shell script alternative supporting a multi-installation setup
     (like Jetbrains Toolbox but in your shell).
 
     Without any argument, displays all the found installations.

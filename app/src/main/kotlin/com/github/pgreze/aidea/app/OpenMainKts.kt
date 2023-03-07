@@ -15,13 +15,13 @@ fun File.generateMainKtsProject(): File =
     resolveMainKtsProject()
         .apply {
             require(deleteRecursively()) {
-                throw IOException("Could not delete $this")
+                throw IOException("Could not delete everything in $this")
             }
             mkdirs()
-            resolve("build.gradle.kts")
-                .writeText(BUILD_GRADLE_KTS)
-            resolve("settings.gradle")
-                .writeText("rootProject.name = \"${name}\"")
+
+            resolve("build.gradle.kts").writeText(BUILD_GRADLE_KTS)
+
+            resolve("settings.gradle").writeText("rootProject.name = \"${name}\"")
 
             resolve("src").let { srcDir ->
                 srcDir.mkdir()
@@ -30,16 +30,15 @@ fun File.generateMainKtsProject(): File =
             }
         }
 
-private val BUILD_GRADLE_KTS = """
-    plugins {
-        kotlin("jvm") version "1.7.10"
-    }
+private const val BUILD_GRADLE_KTS = """plugins {
+    kotlin("jvm") version "1.7.10"
+}
 
-    repositories {
-        mavenCentral { content { includeGroupByRegex("org.jetbrains(|.kotlin)") } }
-    }
+repositories {
+    mavenCentral { content { includeGroupByRegex("org.jetbrains(|.kotlin)") } }
+}
 
-    dependencies {
-        implementation(kotlin("stdlib-jdk8"))
-    }
-""".trimIndent()
+dependencies {
+    implementation(kotlin("stdlib-jdk8"))
+}
+"""
