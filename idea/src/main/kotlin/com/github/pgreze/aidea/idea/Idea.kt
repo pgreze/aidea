@@ -41,10 +41,10 @@ fun listIdeaInstallations(): Sequence<IdeaInstall> = sequence {
         when {
             application.extension != "app" -> null
             // brew install intellij-idea{,-ce}
-            application.startsWith("IntelliJ IDEA") ->
+            application.name.startsWith("IntelliJ IDEA") ->
                 application.resolveLauncher(IdeaType.IDEA)
             // brew install android-studio{,-preview-beta,-preview-canary}
-            application.startsWith("Android Studio") ->
+            application.name.startsWith("Android Studio") ->
                 application.resolveLauncher(IdeaType.ANDROID_STUDIO)
             else -> null
         }?.let { yield(it) }
