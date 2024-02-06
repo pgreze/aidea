@@ -31,14 +31,6 @@ fun File.generateMainKtsProject(): File =
         }
 
 private const val BUILD_GRADLE_KTS = """plugins {
-    kotlin("jvm") version "1.7.10"
-}
-
-repositories {
-    mavenCentral { content { includeGroupByRegex("org.jetbrains(|.kotlin)") } }
-}
-
-dependencies {
-    implementation(kotlin("stdlib-jdk8"))
+    kotlin("jvm") version "1.8.20"
 }
 """
