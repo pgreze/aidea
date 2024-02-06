@@ -1,6 +1,6 @@
 package com.github.pgreze.aidea.idea
 
-import com.google.common.truth.Truth.assertThat
+import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 
 class IdeaTest {
@@ -10,7 +10,6 @@ class IdeaTest {
         val copyright = "Copyright JetBrains s.r.o., (c) 2000-2022"
         val string = "  <string>$infoString. $copyright</string>"
 
-        assertThat(string.extractInfoString())
-            .isEqualTo(infoString)
+        string.extractInfoString() shouldBe infoString
     }
 }

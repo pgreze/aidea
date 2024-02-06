@@ -25,7 +25,7 @@ subprojects {
             testImplementation("org.junit.jupiter:junit-jupiter-params")
             testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
             testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
-            testImplementation("com.google.truth:truth:_")
+            testImplementation("io.kotest:kotest-assertions-core:_")
         }
     }
 }
