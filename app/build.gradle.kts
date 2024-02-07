@@ -1,8 +1,8 @@
 plugins {
     application
     kotlin("jvm")
-    id("com.github.johnrengelman.shadow") version "7.1.2"
-    id("com.palantir.graal") version "0.12.0"
+    id("com.github.johnrengelman.shadow")
+    id("com.palantir.graal")
 }
 
 application {
