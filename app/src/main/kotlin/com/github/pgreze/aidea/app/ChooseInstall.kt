@@ -24,6 +24,7 @@ private fun selectInstallIndex(size: Int): Int? {
         return (readlnOrNull() ?: return null) // ctrl+d
             .toIntOrNull()
             ?.takeIf { it - 1 in 0 until size }
+            ?.let { it - 1 }
             ?: continue
     }
 }
